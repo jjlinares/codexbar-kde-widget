@@ -11,6 +11,7 @@ MouseArea {
     readonly property bool inPanel: [PlasmaCore.Types.TopEdge, PlasmaCore.Types.RightEdge,
                                      PlasmaCore.Types.BottomEdge, PlasmaCore.Types.LeftEdge]
                                     .includes(Plasmoid.location)
+    readonly property bool hasUsage: root.worstUsage > 0
 
     Layout.minimumWidth: Kirigami.Units.iconSizes.small
     Layout.minimumHeight: Kirigami.Units.iconSizes.small
@@ -28,13 +29,13 @@ MouseArea {
         height: width
         source: "../icons/codexbar.png"
         sourceSize: Qt.size(width, height)
-        visible: root.statusColor == "transparent"  // Show original when no usage
+        visible: !compactRoot.hasUsage
     }
 
     MultiEffect {
         anchors.fill: brandIcon
         source: brandIcon
-        visible: root.statusColor != "transparent"  // Show tinted when there's usage
+        visible: compactRoot.hasUsage
         colorization: 1.0
         colorizationColor: root.statusColor
     }

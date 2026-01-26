@@ -8,9 +8,6 @@ import org.kde.notification
 PlasmoidItem {
     id: root
 
-    readonly property int preferredWidth: Kirigami.Units.gridUnit * 20
-    readonly property int preferredHeight: Kirigami.Units.gridUnit * 16
-
     // Provider IDs from metadata singleton
     readonly property var allProviderIds: ProviderMetadata.getProviderIds()
 
@@ -161,35 +158,21 @@ PlasmoidItem {
     }
 
     // State update helpers (QML requires reassignment to trigger bindings)
-    function setProviderData(id, data) {
-        var updated = Object.assign({}, providerData)
-        updated[id] = data
-        providerData = updated
+    function updateMap(map, id, value) {
+        var updated = Object.assign({}, map)
+        if (value === undefined) {
+            delete updated[id]
+        } else {
+            updated[id] = value
+        }
+        return updated
     }
 
-    function removeProviderData(id) {
-        var updated = Object.assign({}, providerData)
-        delete updated[id]
-        providerData = updated
-    }
-
-    function setBackoff(id, value) {
-        var updated = Object.assign({}, providerBackoff)
-        updated[id] = value
-        providerBackoff = updated
-    }
-
-    function setErrors(id, value) {
-        var updated = Object.assign({}, providerErrors)
-        updated[id] = value
-        providerErrors = updated
-    }
-
-    function setSourceIndex(id, value) {
-        var updated = Object.assign({}, providerSourceIndex)
-        updated[id] = value
-        providerSourceIndex = updated
-    }
+    function setProviderData(id, data) { providerData = updateMap(providerData, id, data) }
+    function removeProviderData(id) { providerData = updateMap(providerData, id, undefined) }
+    function setBackoff(id, value) { providerBackoff = updateMap(providerBackoff, id, value) }
+    function setErrors(id, value) { providerErrors = updateMap(providerErrors, id, value) }
+    function setSourceIndex(id, value) { providerSourceIndex = updateMap(providerSourceIndex, id, value) }
 
     function checkThresholds(provider, newData, oldData) {
         if (!newData || !newData.usage || !newData.usage.primary) return
@@ -273,9 +256,5 @@ PlasmoidItem {
         if (meta && meta.dashboardURL) {
             Qt.openUrlExternally(meta.dashboardURL)
         }
-    }
-
-    function refreshNow() {
-        fetchAllProviders()
     }
 }

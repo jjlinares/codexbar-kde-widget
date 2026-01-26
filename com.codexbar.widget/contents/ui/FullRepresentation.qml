@@ -34,7 +34,7 @@ PlasmaExtras.Representation {
 
             PlasmaComponents.ToolButton {
                 icon.name: "view-refresh"
-                onClicked: root.refreshNow()
+                onClicked: root.fetchAllProviders()
                 PlasmaComponents.ToolTip.text: i18n("Refresh now")
                 PlasmaComponents.ToolTip.visible: hovered
                 PlasmaComponents.ToolTip.delay: Kirigami.Units.toolTipDelay
@@ -71,14 +71,11 @@ PlasmaExtras.Representation {
                     readonly property var meta: ProviderMetadata.getProvider(modelData)
                     readonly property var data: root.providerData[modelData]
 
-                    // Only show if we have data for this provider
-                    visible: data !== null && data !== undefined
+                    visible: !!data
                     Layout.fillWidth: true
                     providerName: meta ? meta.displayName : modelData
                     providerIcon: Qt.resolvedUrl("../icons/" + modelData + ".svg")
                     providerData: data || null
-                    hasError: false
-                    errorMessage: ""
                     dashboardUrl: meta ? meta.dashboardURL : ""
                     onOpenDashboard: root.openDashboard(modelData)
                 }

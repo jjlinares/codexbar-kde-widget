@@ -15,9 +15,7 @@ KCM.SimpleKCM {
         anchors.left: parent.left
         anchors.right: parent.right
 
-        // ═══════════════════════════════════════════════════════════════
-        // REFRESH SECTION
-        // ═══════════════════════════════════════════════════════════════
+        // === Refresh ===
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
             Kirigami.FormData.label: i18n("Refresh")
@@ -103,9 +101,7 @@ KCM.SimpleKCM {
             }
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        // THRESHOLDS SECTION
-        // ═══════════════════════════════════════════════════════════════
+        // === Thresholds ===
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
             Kirigami.FormData.label: i18n("Thresholds")
@@ -173,9 +169,6 @@ KCM.SimpleKCM {
         }
     }
 
-    // ═══════════════════════════════════════════════════════════════
-    // HELPER FUNCTIONS
-    // ═══════════════════════════════════════════════════════════════
     function formatInterval(seconds) {
         if (seconds < 60) {
             return seconds + "s"

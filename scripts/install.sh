@@ -78,7 +78,7 @@ install_cli() {
     info "Latest version: $version"
 
     # Download and extract
-    local download_url="https://github.com/${GITHUB_REPO}/releases/download/${version}/codexbar-linux-${arch}.tar.gz"
+    local download_url="https://github.com/${GITHUB_REPO}/releases/download/${version}/CodexBarCLI-${version}-linux-${arch}.tar.gz"
     local tmp_dir
     tmp_dir=$(mktemp -d)
     trap "rm -rf '$tmp_dir'" EXIT
@@ -91,9 +91,9 @@ install_cli() {
     mkdir -p "$INSTALL_DIR"
     tar -xzf "${tmp_dir}/codexbar.tar.gz" -C "$tmp_dir"
 
-    # Find and install binary
+    # Find and install binary (may be named codexbar or CodexBarCLI)
     local binary
-    binary=$(find "$tmp_dir" -name "codexbar" -type f -perm -111 | head -1)
+    binary=$(find "$tmp_dir" -type f -perm -111 \( -name "codexbar" -o -name "CodexBarCLI" \) | head -1)
     if [ -z "$binary" ]; then
         error "Binary not found in archive"
     fi

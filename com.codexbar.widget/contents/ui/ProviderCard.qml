@@ -14,6 +14,8 @@ ColumnLayout {
     property string errorMessage: ""
     property string dashboardUrl: ""
 
+    readonly property bool hasUsage: !!(providerData && providerData.usage)
+
     signal openDashboard()
 
     spacing: Kirigami.Units.smallSpacing
@@ -66,7 +68,7 @@ ColumnLayout {
 
         // Session usage
         ColumnLayout {
-            visible: providerData && providerData.usage && providerData.usage.primary
+            visible: hasUsage && providerData.usage.primary
             Layout.fillWidth: true
             spacing: 2
 
@@ -95,7 +97,7 @@ ColumnLayout {
 
         // Weekly usage
         ColumnLayout {
-            visible: providerData && providerData.usage && providerData.usage.secondary
+            visible: hasUsage && providerData.usage.secondary
             Layout.fillWidth: true
             spacing: 2
 
@@ -145,17 +147,13 @@ ColumnLayout {
     }
 
     function getResetTime(type) {
-        if (!providerData || !providerData.usage || !providerData.usage[type]) {
-            return ""
-        }
+        if (!hasUsage || !providerData.usage[type]) return ""
+
         var resetAt = providerData.usage[type].resetsAt
-        var timeStr = ""
         if (!resetAt) {
-            // Fall back to resetDescription if resetsAt not available
-            timeStr = providerData.usage[type].resetDescription || ""
-        } else {
-            timeStr = root.formatRelativeTime(resetAt)
+            var desc = providerData.usage[type].resetDescription || ""
+            return desc ? i18n("Resets in %1", desc) : ""
         }
-        return timeStr ? i18n("Resets in %1", timeStr) : ""
+        return i18n("Resets in %1", root.formatRelativeTime(resetAt))
     }
 }

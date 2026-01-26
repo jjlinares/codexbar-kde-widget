@@ -126,33 +126,20 @@ QtObject {
         }
     ]
 
-    // Helper function to get provider metadata by ID
+    // Lookup map for O(1) provider access
+    readonly property var providerMap: {
+        var map = {}
+        for (var i = 0; i < providers.length; i++) {
+            map[providers[i].id] = providers[i]
+        }
+        return map
+    }
+
     function getProvider(providerId) {
-        for (var i = 0; i < providers.length; i++) {
-            if (providers[i].id === providerId) {
-                return providers[i]
-            }
-        }
-        return null
+        return providerMap[providerId] || null
     }
 
-    // Get all provider IDs
     function getProviderIds() {
-        var ids = []
-        for (var i = 0; i < providers.length; i++) {
-            ids.push(providers[i].id)
-        }
-        return ids
-    }
-
-    // Get providers that are enabled by default
-    function getDefaultEnabledProviders() {
-        var enabled = []
-        for (var i = 0; i < providers.length; i++) {
-            if (providers[i].defaultEnabled) {
-                enabled.push(providers[i].id)
-            }
-        }
-        return enabled
+        return Object.keys(providerMap)
     }
 }
