@@ -11,9 +11,13 @@
             <min>30</min>
             <max>300</max>
         </entry>
-        <entry name="notificationThresholds" type="IntList">
-            <label>Usage thresholds for notifications</label>
-            <default>80,95</default>
+        <entry name="warningThreshold" type="Int">
+            <label>Warning notification threshold percent</label>
+            <default>60</default>
+        </entry>
+        <entry name="criticalThreshold" type="Int">
+            <label>Critical notification threshold percent</label>
+            <default>90</default>
         </entry>
         <entry name="lastProviderChange" type="Int">
             <label>Timestamp of last provider config change (triggers refresh)</label>

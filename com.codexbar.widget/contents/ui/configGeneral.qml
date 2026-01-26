@@ -8,8 +8,8 @@ KCM.SimpleKCM {
     id: configPage
 
     property alias cfg_refreshInterval: refreshSlider.value
-    property int cfg_notificationThresholds_0: 80
-    property int cfg_notificationThresholds_1: 95
+    property alias cfg_warningThreshold: threshold1Spinner.value
+    property alias cfg_criticalThreshold: threshold2Spinner.value
 
     Kirigami.FormLayout {
         anchors.left: parent.left
@@ -40,19 +40,20 @@ KCM.SimpleKCM {
                     stepSize: 30
                     snapMode: QQC2.Slider.SnapAlways
                     Layout.fillWidth: true
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
 
                     background: Rectangle {
                         x: refreshSlider.leftPadding
                         y: refreshSlider.topPadding + refreshSlider.availableHeight / 2 - height / 2
                         width: refreshSlider.availableWidth
-                        height: 4
-                        radius: 2
+                        height: 6
+                        radius: 3
                         color: Kirigami.Theme.separatorColor
 
                         Rectangle {
                             width: refreshSlider.visualPosition * parent.width
                             height: parent.height
-                            radius: 2
+                            radius: 3
                             color: Kirigami.Theme.highlightColor
                         }
                     }
@@ -60,8 +61,8 @@ KCM.SimpleKCM {
 
                 // Value badge
                 Rectangle {
-                    Layout.preferredWidth: Kirigami.Units.gridUnit * 3.5
-                    Layout.preferredHeight: Kirigami.Units.gridUnit * 1.6
+                    Layout.preferredWidth: Kirigami.Units.gridUnit * 4
+                    Layout.preferredHeight: Kirigami.Units.gridUnit * 2
                     radius: Kirigami.Units.smallSpacing
                     color: Kirigami.Theme.highlightColor
                     opacity: 0.9
@@ -70,6 +71,7 @@ KCM.SimpleKCM {
                         anchors.centerIn: parent
                         text: formatInterval(refreshSlider.value)
                         font.weight: Font.Medium
+                        font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
                         color: Kirigami.Theme.highlightedTextColor
                     }
                 }
@@ -102,11 +104,11 @@ KCM.SimpleKCM {
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // NOTIFICATIONS SECTION
+        // THRESHOLDS SECTION
         // ═══════════════════════════════════════════════════════════════
         Kirigami.Separator {
             Kirigami.FormData.isSection: true
-            Kirigami.FormData.label: i18n("Notifications")
+            Kirigami.FormData.label: i18n("Thresholds")
         }
 
         // Warning threshold
@@ -115,25 +117,20 @@ KCM.SimpleKCM {
             spacing: Kirigami.Units.largeSpacing
 
             Rectangle {
-                width: Kirigami.Units.smallSpacing
-                height: Kirigami.Units.gridUnit * 1.5
+                width: Kirigami.Units.smallSpacing * 1.5
+                height: Kirigami.Units.gridUnit * 2
                 radius: width / 2
                 color: Kirigami.Theme.neutralTextColor
             }
 
             QQC2.SpinBox {
                 id: threshold1Spinner
-                from: 50
-                to: 94
-                value: configPage.cfg_notificationThresholds_0
-                onValueChanged: {
-                    configPage.cfg_notificationThresholds_0 = value
-                    // Ensure warning < critical
-                    if (value >= threshold2Spinner.value) {
-                        threshold2Spinner.value = Math.min(value + 1, 100)
-                    }
-                }
-
+                from: 5
+                to: threshold2Spinner.value - 5
+                stepSize: 5
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2.2
+                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
                 textFromValue: function(value) { return value + "%" }
                 valueFromText: function(text) { return parseInt(text) }
             }
@@ -145,25 +142,20 @@ KCM.SimpleKCM {
             spacing: Kirigami.Units.largeSpacing
 
             Rectangle {
-                width: Kirigami.Units.smallSpacing
-                height: Kirigami.Units.gridUnit * 1.5
+                width: Kirigami.Units.smallSpacing * 1.5
+                height: Kirigami.Units.gridUnit * 2
                 radius: width / 2
                 color: Kirigami.Theme.negativeTextColor
             }
 
             QQC2.SpinBox {
                 id: threshold2Spinner
-                from: 51
+                from: threshold1Spinner.value + 5
                 to: 100
-                value: configPage.cfg_notificationThresholds_1
-                onValueChanged: {
-                    configPage.cfg_notificationThresholds_1 = value
-                    // Ensure critical > warning
-                    if (value <= threshold1Spinner.value) {
-                        threshold1Spinner.value = Math.max(value - 1, 50)
-                    }
-                }
-
+                stepSize: 5
+                Layout.preferredWidth: Kirigami.Units.gridUnit * 7
+                Layout.preferredHeight: Kirigami.Units.gridUnit * 2.2
+                font.pointSize: Kirigami.Theme.defaultFont.pointSize * 1.1
                 textFromValue: function(value) { return value + "%" }
                 valueFromText: function(text) { return parseInt(text) }
             }

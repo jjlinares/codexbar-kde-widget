@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Layouts
+import QtQuick.Effects
 import org.kde.plasma.plasmoid
 import org.kde.kirigami as Kirigami
 import org.kde.plasma.core as PlasmaCore
@@ -19,27 +20,23 @@ MouseArea {
     hoverEnabled: true
     onClicked: root.expanded = !root.expanded
 
-    // Colored circle indicator
-    Rectangle {
-        id: statusIndicator
+    // Brand icon with status color tint
+    Image {
+        id: brandIcon
         anchors.centerIn: parent
-        width: Math.min(parent.width, parent.height) * 0.7
+        width: Math.min(parent.width, parent.height) * 0.85
         height: width
-        radius: width / 2
-        color: root.statusColor
-        border.width: 1
-        border.color: Kirigami.Theme.textColor
-        opacity: 0.9
+        source: "../icons/codexbar.svg"
+        sourceSize: Qt.size(width, height)
+        visible: root.statusColor == "transparent"  // Show original when no usage
+    }
 
-        // Inner highlight
-        Rectangle {
-            anchors.centerIn: parent
-            width: parent.width * 0.3
-            height: width
-            radius: width / 2
-            color: Qt.lighter(parent.color, 1.3)
-            opacity: 0.5
-        }
+    MultiEffect {
+        anchors.fill: brandIcon
+        source: brandIcon
+        visible: root.statusColor != "transparent"  // Show tinted when there's usage
+        colorization: 1.0
+        colorizationColor: root.statusColor
     }
 
     // Hover effect

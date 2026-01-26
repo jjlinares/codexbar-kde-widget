@@ -27,7 +27,8 @@ PlasmoidItem {
 
     // Configuration
     readonly property int refreshInterval: Plasmoid.configuration.refreshInterval
-    readonly property var notificationThresholds: Plasmoid.configuration.notificationThresholds
+    readonly property int warningThreshold: Plasmoid.configuration.warningThreshold
+    readonly property int criticalThreshold: Plasmoid.configuration.criticalThreshold
 
     // Compute worst usage across all providers with data
     readonly property real worstUsage: {
@@ -44,8 +45,9 @@ PlasmoidItem {
     readonly property bool hasAnyProvider: Object.keys(providerData).length > 0
 
     readonly property color statusColor: {
-        if (worstUsage >= 90) return Kirigami.Theme.negativeTextColor
-        if (worstUsage >= 70) return Kirigami.Theme.neutralTextColor
+        if (worstUsage <= 0) return "transparent"  // No color when idle
+        if (worstUsage >= criticalThreshold) return Kirigami.Theme.negativeTextColor
+        if (worstUsage >= warningThreshold) return Kirigami.Theme.neutralTextColor
         return Kirigami.Theme.positiveTextColor
     }
 
@@ -196,14 +198,11 @@ PlasmoidItem {
         var oldPercent = (oldData && oldData.usage && oldData.usage.primary)
             ? (oldData.usage.primary.usedPercent || 0) : 0
 
-        var thresholds = notificationThresholds || [80, 95]
-
-        for (var i = 0; i < thresholds.length; i++) {
-            var threshold = thresholds[i]
-            if (currentPercent >= threshold && oldPercent < threshold) {
-                sendNotification(provider, currentPercent, threshold)
-                break
-            }
+        // Check critical first, then warning
+        if (currentPercent >= criticalThreshold && oldPercent < criticalThreshold) {
+            sendNotification(provider, currentPercent, criticalThreshold)
+        } else if (currentPercent >= warningThreshold && oldPercent < warningThreshold) {
+            sendNotification(provider, currentPercent, warningThreshold)
         }
     }
 
