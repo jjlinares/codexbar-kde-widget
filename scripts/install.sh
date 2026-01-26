@@ -112,6 +112,32 @@ install_cli() {
     fi
 }
 
+# Install icon to user's icon theme
+install_icon() {
+    local icon_src="$WIDGET_DIR/contents/icons/codexbar.png"
+    local icon_dir="${HOME}/.local/share/icons/hicolor"
+
+    if [ ! -f "$icon_src" ]; then
+        warn "Icon file not found: $icon_src"
+        return 0
+    fi
+
+    info "Installing icon to theme..."
+
+    # Install to multiple sizes for best compatibility
+    for size in 128x128 256x256 512x512; do
+        mkdir -p "${icon_dir}/${size}/apps"
+        cp "$icon_src" "${icon_dir}/${size}/apps/codexbar.png"
+    done
+
+    # Update icon cache
+    if command -v gtk-update-icon-cache &> /dev/null; then
+        gtk-update-icon-cache -f -t "$icon_dir" 2>/dev/null || true
+    fi
+
+    success "Icon installed"
+}
+
 # Install Plasma widget
 install_widget() {
     # Remove existing installation if present
@@ -127,6 +153,8 @@ install_widget() {
 
 # Main
 install_cli
+echo
+install_icon
 echo
 install_widget
 
@@ -144,3 +172,4 @@ echo
 echo "To uninstall:"
 echo "  kpackagetool6 -t Plasma/Applet -r com.codexbar.widget"
 echo "  rm ~/.local/bin/codexbar"
+echo "  rm ~/.local/share/icons/hicolor/*/apps/codexbar.png"

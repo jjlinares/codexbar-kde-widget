@@ -1,12 +1,19 @@
 # CodexBar KDE Widget
 
-KDE Plasma 6 widget for displaying AI provider usage from CodexBar CLI.
+KDE Plasma 6 widget that displays real-time AI provider usage (Claude, Codex, Kiro, Gemini, etc.) in your system panel. Shows usage percentages with color-coded thresholds and auto-discovers which providers you have configured.
+
+## Agent Instructions
+
+**Always use Context7** to verify assumptions or learn about KDE Plasma development:
+```
+context7 library: /websites/develop_kde
+```
+Query this before making claims about QML, Plasma APIs, or widget behavior.
 
 ## CodexBar CLI Reference
 
 ### Installation
 ```bash
-# Download from GitHub releases
 VERSION=$(curl -fsSL "https://api.github.com/repos/steipete/CodexBar/releases/latest" | jq -r '.tag_name')
 curl -fsSL "https://github.com/steipete/CodexBar/releases/download/${VERSION}/codexbar-linux-x86_64.tar.gz" -o /tmp/codexbar.tar.gz
 tar -xzf /tmp/codexbar.tar.gz -C /tmp
@@ -33,37 +40,23 @@ codexbar --version                                        # check version
 
 ### How It Works
 1. On startup and each refresh, widget tries to fetch usage for ALL 17 providers
-2. For each provider, tries sources in order: **oauth → cli → api**
+2. For each provider, tries sources in order: **oauth -> cli -> api**
 3. If any source returns data, provider is shown in the widget
 4. If all sources fail, provider is silently skipped (with backoff)
 
 ### Provider Discovery
-No config file needed. The widget automatically discovers which providers work by trying them all. If you have Claude CLI authenticated, Claude shows up. If you have Kiro CLI installed, Kiro shows up. Etc.
+No config file needed. The widget automatically discovers which providers work by trying them all.
 
 ### Source Fallback Chain
 ```
 oauth (fast API)
-  ↓ fail
+  | fail
 cli (spawn CLI process)
-  ↓ fail
+  | fail
 api (API key)
-  ↓ fail
+  | fail
 Skip provider (apply backoff)
 ```
-
-### Providers That Work on Linux
-| Provider | Working Source | Requirements |
-|----------|---------------|--------------|
-| claude | oauth | Claude CLI authenticated |
-| codex | cli | Codex CLI installed |
-| kiro | cli | kiro-cli installed + AWS Builder ID |
-| vertexai | oauth | gcloud auth |
-| gemini | api | Gemini CLI credentials |
-| copilot | api | API token |
-| zai, kimi, minimax, kimik2 | api | API keys |
-
-### Providers NOT Supported on Linux
-cursor, amp, augment, factory, opencode (require browser cookies / web source)
 
 ### JSON Response Format
 ```json

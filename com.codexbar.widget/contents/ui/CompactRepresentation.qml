@@ -26,7 +26,7 @@ MouseArea {
         anchors.centerIn: parent
         width: Math.min(parent.width, parent.height) * 0.85
         height: width
-        source: "../icons/codexbar.svg"
+        source: "../icons/codexbar.png"
         sourceSize: Qt.size(width, height)
         visible: root.statusColor == "transparent"  // Show original when no usage
     }
