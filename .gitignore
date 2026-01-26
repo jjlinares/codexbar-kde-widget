@@ -1,0 +1,19 @@
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.pyc
+__pycache__/
+*.qmlc
+*.jsc
+
+# Plasma debug
+plasmoidviewer-*

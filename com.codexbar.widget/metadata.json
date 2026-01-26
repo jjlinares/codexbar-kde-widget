@@ -1,0 +1,15 @@
+{
+    "KPlugin": {
+        "Id": "com.codexbar.widget",
+        "Name": "CodexBar",
+        "Description": "Monitor AI provider usage limits (Claude, Codex)",
+        "Icon": "codexbar",
+        "Authors": [{ "Name": "CodexBar Contributors" }],
+        "Category": "System Information",
+        "Version": "1.0.0",
+        "Website": "https://github.com/jjlinares/codexbar-kde-widget",
+        "EnabledByDefault": true
+    },
+    "KPackageStructure": "Plasma/Applet",
+    "X-Plasma-API-Minimum-Version": "6.0"
+}
