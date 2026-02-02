@@ -34,7 +34,7 @@ PlasmaExtras.Representation {
 
             PlasmaComponents.ToolButton {
                 icon.name: "view-refresh"
-                onClicked: root.fetchAllProviders()
+                onClicked: root.fetchAllProviders(true)
                 PlasmaComponents.ToolTip.text: i18n("Refresh now")
                 PlasmaComponents.ToolTip.visible: hovered
                 PlasmaComponents.ToolTip.delay: Kirigami.Units.toolTipDelay

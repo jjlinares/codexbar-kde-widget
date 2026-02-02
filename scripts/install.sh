@@ -162,9 +162,8 @@ echo
 echo -e "${GREEN}Installation complete!${NC}"
 echo
 echo "Next steps:"
-echo "  1. Authenticate with providers:"
-echo "     codexbar auth claude"
-echo "     codexbar auth codex"
+echo "  1. Authenticate with your AI providers (e.g. log in to Claude CLI, Codex CLI, etc.)"
+echo "     The widget auto-discovers providers that are already authenticated."
 echo
 echo "  2. Add the widget:"
 echo "     Right-click desktop/panel → Add Widgets → Search 'CodexBar'"

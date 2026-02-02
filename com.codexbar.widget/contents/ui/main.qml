@@ -73,11 +73,21 @@ PlasmoidItem {
     }
 
     Timer {
+        id: startupTimer
+        interval: 3000
+        running: true
+        repeat: false
+        onTriggered: {
+            fetchAllProviders()
+            refreshTimer.start()
+        }
+    }
+
+    Timer {
         id: refreshTimer
         interval: root.refreshInterval * 1000
-        running: true
+        running: false
         repeat: true
-        triggeredOnStart: true
         onTriggered: fetchAllProviders()
     }
 
@@ -89,16 +99,20 @@ PlasmoidItem {
         urgency: Notification.NormalUrgency
     }
 
-    Component.onCompleted: fetchAllProviders()
+    // Startup fetch handled by startupTimer (3s delay for engine readiness)
 
-    function fetchAllProviders() {
+    function fetchAllProviders(force) {
         for (var i = 0; i < allProviderIds.length; i++) {
             var id = allProviderIds[i]
             var backoff = providerBackoff[id] || 0
 
-            if (backoff > 0) {
+            if (!force && backoff > 0) {
                 setBackoff(id, backoff - refreshInterval)
             } else {
+                if (force) {
+                    setBackoff(id, 0)
+                    setErrors(id, 0)
+                }
                 fetchProviderWithSource(id, 0)
             }
         }
