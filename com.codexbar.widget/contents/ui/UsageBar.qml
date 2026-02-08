@@ -7,11 +7,12 @@ Item {
     id: usageBar
 
     property real value: 0  // 0-100
+    property int warningThreshold: 70
+    property int criticalThreshold: 90
 
-    // Color thresholds: green <70%, yellow 70-90%, red >90%
     readonly property color barColor: {
-        if (value >= 90) return Kirigami.Theme.negativeTextColor
-        if (value >= 70) return Kirigami.Theme.neutralTextColor
+        if (value >= criticalThreshold) return Kirigami.Theme.negativeTextColor
+        if (value >= warningThreshold) return Kirigami.Theme.neutralTextColor
         return Kirigami.Theme.positiveTextColor
     }
 

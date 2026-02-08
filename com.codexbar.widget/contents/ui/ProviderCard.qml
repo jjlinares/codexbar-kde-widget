@@ -13,6 +13,8 @@ ColumnLayout {
     property bool hasError: false
     property string errorMessage: ""
     property string dashboardUrl: ""
+    property int warningThreshold: 70
+    property int criticalThreshold: 90
 
     readonly property bool hasUsage: !!(providerData && providerData.usage)
 
@@ -92,6 +94,8 @@ ColumnLayout {
             UsageBar {
                 Layout.fillWidth: true
                 value: getUsagePercent("primary")
+                warningThreshold: providerCard.warningThreshold
+                criticalThreshold: providerCard.criticalThreshold
             }
         }
 
@@ -121,6 +125,8 @@ ColumnLayout {
             UsageBar {
                 Layout.fillWidth: true
                 value: getUsagePercent("secondary")
+                warningThreshold: providerCard.warningThreshold
+                criticalThreshold: providerCard.criticalThreshold
             }
         }
     }

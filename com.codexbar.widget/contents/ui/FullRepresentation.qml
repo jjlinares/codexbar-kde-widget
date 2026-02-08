@@ -77,6 +77,8 @@ PlasmaExtras.Representation {
                     providerIcon: Qt.resolvedUrl("../icons/" + modelData + ".svg")
                     providerData: data || null
                     dashboardUrl: meta ? meta.dashboardURL : ""
+                    warningThreshold: root.warningThreshold
+                    criticalThreshold: root.criticalThreshold
                     onOpenDashboard: root.openDashboard(modelData)
                 }
             }
