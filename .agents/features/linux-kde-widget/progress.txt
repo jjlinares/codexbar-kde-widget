@@ -1,0 +1,67 @@
+## All Tasks - 2026-01-24
+
+### Completed Implementation
+
+Created complete KDE Plasma 6 plasmoid widget at com.codexbar.widget/
+
+**Structure:**
+- metadata.json - Widget metadata with Plasma 6 API (no system tray support)
+- contents/ui/main.qml - Entry point with PlasmoidItem, data fetching, notifications
+- contents/ui/CompactRepresentation.qml - Panel icon with color indicator
+- contents/ui/FullRepresentation.qml - Expanded popup with provider cards
+- contents/ui/ProviderCard.qml - Reusable provider section component
+- contents/ui/UsageBar.qml - Color-coded progress bar with percentage overlay
+- contents/ui/configGeneral.qml - Configuration UI
+- contents/config/main.xml - Config schema (refreshInterval, thresholds, providers)
+- contents/config/config.qml - Config page registration
+- contents/icons/*.svg - Widget and provider icons
+
+**Key Patterns:**
+- Uses Plasma5Support.DataSource with "executable" engine for CLI calls
+- Kirigami.Theme for all colors - no hardcoded values except progress bar thresholds
+- Exponential backoff: 60s -> 120s -> 240s -> 300s max on consecutive errors
+- Notification rate limiting: 1 per provider per threshold per hour
+- OAuth to CLI fallback on auth errors
+
+**Scripts and Docs:**
+- scripts/install.sh - Installation script (installs CLI + widget)
+- README.md - Installation and troubleshooting docs
+
+**Files created:**
+- com.codexbar.widget/metadata.json
+- com.codexbar.widget/contents/ui/main.qml
+- com.codexbar.widget/contents/ui/CompactRepresentation.qml
+- com.codexbar.widget/contents/ui/FullRepresentation.qml
+- com.codexbar.widget/contents/ui/ProviderCard.qml
+- com.codexbar.widget/contents/ui/UsageBar.qml
+- com.codexbar.widget/contents/ui/configGeneral.qml
+- com.codexbar.widget/contents/config/main.xml
+- com.codexbar.widget/contents/config/config.qml
+- com.codexbar.widget/contents/icons/codexbar.svg
+- com.codexbar.widget/contents/icons/claude.svg
+- com.codexbar.widget/contents/icons/codex.svg
+- scripts/install.sh
+
+---
+
+## Bug Tasks Added - 2026-01-24
+
+### bug-1: Auth failure on PC restart
+**Problem:** Widget fails to connect after reboot until plasmashell is restarted
+**Analysis:** OAuth fallback in main.qml only triggers if stderr contains "oauth"/"OAuth" - may miss other auth errors during cold start
+**Files:** com.codexbar.widget/contents/ui/main.qml:138-161, 181-204
+
+### bug-2: System tray support removed (WONTFIX)
+**Problem:** Clicking compact icon in system tray doesn't expand panel (works in taskbar)
+**Root Cause:** QML id lookup fails in system tray context - Plasma 6 wraps applets differently in system tray, breaking `root` reference from CompactRepresentation.qml
+**Decision:** Removed system tray support (X-Plasma-NotificationArea metadata). Widget works in regular panels and desktop. Users wanting tray icon can use codexbar-tray Python app.
+
+### bug-3: Reset time missing "Resets in" prefix
+**Problem:** Shows "2h 15m" instead of "Resets in 2h 15m"
+**Analysis:** ProviderCard.qml getResetTime() returns raw formatted time without prefix
+**Files:** com.codexbar.widget/contents/ui/ProviderCard.qml:147-157
+
+### bug-4: Claude icon missing orange brand color
+**Problem:** Claude icon is white on transparent - should use Claude's orange brand color
+**Analysis:** contents/icons/claude.svg uses fill="white"
+**Files:** com.codexbar.widget/contents/icons/claude.svg

@@ -1,0 +1,375 @@
+{
+  "prdName": "linux-kde-widget",
+  "tasks": [
+    {
+      "id": "scaffold-1",
+      "category": "scaffold",
+      "description": "Create plasmoid directory structure with metadata.json and entry point",
+      "steps": [
+        "Verify com.codexbar.widget/ directory exists",
+        "Verify metadata.json contains Id, Name, Category, X-Plasma-API-Minimum-Version: 6.0",
+        "Verify metadata.json has X-Plasma-API-Minimum-Version: 6.0 (no system tray support)",
+        "Verify contents/ui/main.qml exists with PlasmoidItem root element",
+        "Run: kpackagetool6 -t Plasma/Applet -s com.codexbar.widget (shows package info)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "scaffold-2",
+      "category": "scaffold",
+      "description": "Create configuration schema and config UI registration",
+      "steps": [
+        "Verify contents/config/main.xml exists with refreshInterval, notificationThresholds, enableClaude, enableCodex entries",
+        "Verify contents/config/config.qml registers ConfigGeneral page",
+        "Verify contents/ui/configGeneral.qml exists",
+        "Install widget and right-click → Configure CodexBar opens config dialog"
+      ],
+      "passes": true
+    },
+    {
+      "id": "ui-1",
+      "category": "ui",
+      "description": "Implement CompactRepresentation with colored status icon",
+      "steps": [
+        "Verify contents/ui/CompactRepresentation.qml exists",
+        "Add widget to panel, verify colored circle icon appears",
+        "With 0% usage: icon is green",
+        "With 75% usage: icon is yellow",
+        "With 95% usage: icon is red",
+        "Hover icon shows tooltip: 'Claude: X% | Codex: Y%'"
+      ],
+      "passes": true
+    },
+    {
+      "id": "ui-2",
+      "category": "ui",
+      "description": "Implement FullRepresentation with provider cards and usage bars",
+      "steps": [
+        "Verify contents/ui/FullRepresentation.qml exists",
+        "Click compact icon, verify popup expands",
+        "Verify title bar shows 'CodexBar' with refresh and settings buttons",
+        "Verify Claude section shows: icon, name, session bar, weekly bar",
+        "Verify Codex section shows: icon, name, session bar, weekly bar",
+        "Verify progress bars use theme colors (green/yellow/red thresholds)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "ui-3",
+      "category": "ui",
+      "description": "Create reusable ProviderCard and UsageBar components",
+      "steps": [
+        "Verify contents/ui/ProviderCard.qml exists",
+        "Verify contents/ui/UsageBar.qml exists",
+        "UsageBar shows percentage text overlay on bar",
+        "UsageBar color changes at 70% (yellow) and 90% (red) thresholds",
+        "ProviderCard displays reset time as relative ('2h 15m', not absolute date)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "ui-4",
+      "category": "ui",
+      "description": "Add Dashboard buttons that open provider web pages",
+      "steps": [
+        "Each provider card has 'Dashboard' button",
+        "Click Claude Dashboard → opens https://claude.ai/settings/usage in browser",
+        "Click Codex Dashboard → opens https://chatgpt.com/ in browser"
+      ],
+      "passes": true
+    },
+    {
+      "id": "ui-5",
+      "category": "ui",
+      "description": "Copy provider SVG icons from tray app resources",
+      "steps": [
+        "Verify contents/icons/codexbar.svg exists (widget icon)",
+        "Verify contents/icons/claude.svg exists",
+        "Verify contents/icons/codex.svg exists",
+        "Icons display correctly in ProviderCard components"
+      ],
+      "passes": true
+    },
+    {
+      "id": "data-1",
+      "category": "data",
+      "description": "Implement CLI data fetching via Plasma5Support DataSource",
+      "steps": [
+        "main.qml imports org.kde.plasma.plasma5support",
+        "DataSource uses engine: 'executable'",
+        "Executes: codexbar usage --source oauth --provider claude --json",
+        "Executes: codexbar usage --source oauth --provider codex --json",
+        "JSON response parsed and populates UI with usage percentages"
+      ],
+      "passes": true
+    },
+    {
+      "id": "data-2",
+      "category": "data",
+      "description": "Implement OAuth to CLI fallback on fetch errors",
+      "steps": [
+        "If --source oauth fails, retry with --source cli",
+        "Verify fallback triggers on OAuth error response",
+        "UI updates with CLI source data when fallback succeeds"
+      ],
+      "passes": true
+    },
+    {
+      "id": "data-3",
+      "category": "data",
+      "description": "Implement periodic refresh with configurable interval",
+      "steps": [
+        "Timer triggers data fetch every refreshInterval seconds",
+        "Default interval is 60 seconds",
+        "Change config to 120s, verify fetch interval changes",
+        "Refresh button in header triggers immediate fetch"
+      ],
+      "passes": true
+    },
+    {
+      "id": "data-4",
+      "category": "data",
+      "description": "Implement exponential backoff on CLI errors",
+      "steps": [
+        "First error: next retry in 60s",
+        "Second consecutive error: retry in 120s",
+        "Third consecutive error: retry in 240s",
+        "Caps at 300s max backoff",
+        "Successful fetch resets backoff to normal interval"
+      ],
+      "passes": true
+    },
+    {
+      "id": "data-5",
+      "category": "data",
+      "description": "Show error state with setup hint when CLI fails",
+      "steps": [
+        "When codexbar CLI not found: show 'CLI not found' error",
+        "When OAuth fails: show 'Run: codexbar auth claude' hint",
+        "Error state is visible in FullRepresentation",
+        "Error clears on successful fetch"
+      ],
+      "passes": true
+    },
+    {
+      "id": "config-1",
+      "category": "config",
+      "description": "Implement configuration UI with refresh interval slider",
+      "steps": [
+        "configGeneral.qml has slider for refreshInterval",
+        "Slider range: 30-300 seconds",
+        "Default value: 60",
+        "Changing slider updates plasmoid.configuration.refreshInterval",
+        "Value persists after Plasma restart"
+      ],
+      "passes": true
+    },
+    {
+      "id": "config-2",
+      "category": "config",
+      "description": "Implement provider enable/disable checkboxes",
+      "steps": [
+        "configGeneral.qml has checkboxes for Claude and Codex",
+        "Unchecking Claude hides Claude from UI and skips fetch",
+        "Unchecking Codex hides Codex from UI and skips fetch",
+        "At least one provider must remain enabled"
+      ],
+      "passes": true
+    },
+    {
+      "id": "config-3",
+      "category": "config",
+      "description": "Implement notification threshold configuration",
+      "steps": [
+        "configGeneral.qml has inputs for notification thresholds",
+        "Default thresholds: 80, 95",
+        "Thresholds stored in plasmoid.configuration.notificationThresholds",
+        "Changing thresholds affects when notifications fire"
+      ],
+      "passes": true
+    },
+    {
+      "id": "notify-1",
+      "category": "notification",
+      "description": "Send KDE notification when usage crosses threshold",
+      "steps": [
+        "When Claude usage crosses 80%: notification appears",
+        "When Claude usage crosses 95%: notification appears",
+        "Notification shows: provider name and percentage",
+        "Notification uses KDE notification system (visible in notification center)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "notify-2",
+      "category": "notification",
+      "description": "Rate-limit notifications to max 1 per provider per hour",
+      "steps": [
+        "First threshold cross: notification fires",
+        "Second threshold cross within 1 hour: no notification",
+        "After 1 hour: notification fires again on threshold cross",
+        "Rate limit is per-provider (Claude and Codex tracked separately)"
+      ],
+      "passes": true
+    },
+    {
+      "id": "notify-3",
+      "category": "notification",
+      "description": "Clicking notification opens provider dashboard",
+      "steps": [
+        "Click Claude notification → opens https://claude.ai/settings/usage",
+        "Click Codex notification → opens https://chatgpt.com/"
+      ],
+      "passes": true
+    },
+    {
+      "id": "placement-1",
+      "category": "placement",
+      "description": "Widget appears in Add Widgets dialog under System Information",
+      "steps": [
+        "Right-click desktop → Add Widgets",
+        "Search 'CodexBar' → widget appears in results",
+        "Browse 'System Information' category → widget listed",
+        "Widget shows correct icon and description"
+      ],
+      "passes": true
+    },
+    {
+      "id": "placement-2",
+      "category": "placement",
+      "description": "Widget can be placed on desktop with resizing",
+      "steps": [
+        "Drag widget from Add Widgets to desktop",
+        "Widget displays FullRepresentation on desktop",
+        "Widget is resizable (drag corners)",
+        "Widget position persists after logout/login"
+      ],
+      "passes": true
+    },
+    {
+      "id": "placement-3",
+      "category": "placement",
+      "description": "Widget can be added to panel (system tray not supported)",
+      "steps": [
+        "Add widget to panel (not desktop)",
+        "CompactRepresentation (icon) shows in panel",
+        "Click icon → FullRepresentation popup appears",
+        "Click outside popup → popup closes",
+        "Note: System tray placement removed due to Plasma 6 API limitations"
+      ],
+      "passes": true
+    },
+    {
+      "id": "theme-1",
+      "category": "theme",
+      "description": "Widget respects Plasma theme colors",
+      "steps": [
+        "Switch to Breeze Light theme → widget colors adapt",
+        "Switch to Breeze Dark theme → widget colors adapt",
+        "No hardcoded colors visible (uses Kirigami.Theme)",
+        "Progress bar colors still follow green/yellow/red thresholds"
+      ],
+      "passes": true
+    },
+    {
+      "id": "install-1",
+      "category": "install",
+      "description": "Create install script for manual installation",
+      "steps": [
+        "Verify scripts/install.sh exists",
+        "Script installs codexbar CLI (with architecture detection)",
+        "Script runs: kpackagetool6 -t Plasma/Applet -i com.codexbar.widget",
+        "After install, widget appears in Add Widgets dialog",
+        "Script provides uninstall instructions"
+      ],
+      "passes": true
+    },
+    {
+      "id": "install-2",
+      "category": "install",
+      "description": "Create README with installation instructions",
+      "steps": [
+        "Verify README.md exists",
+        "Documents prerequisite: KDE Plasma 6",
+        "Documents install command: ./scripts/install.sh",
+        "Documents uninstall command",
+        "Includes troubleshooting for common errors"
+      ],
+      "passes": true
+    },
+    {
+      "id": "bug-1",
+      "category": "bug",
+      "description": "Fix authentication failure on PC restart - widget fails to connect until plasmashell restart",
+      "steps": [
+        "Reboot PC with widget installed",
+        "Widget auto-starts and fetches data within 60s without manual intervention",
+        "If OAuth fails on cold start, CLI fallback triggers automatically",
+        "Verify fallback logic handles all auth error cases (not just 'oauth' in stderr)",
+        "Consider adding startup delay or retry logic for Plasma session initialization"
+      ],
+      "passes": true
+    },
+    {
+      "id": "bug-2",
+      "category": "bug",
+      "description": "System tray support removed - Plasma 6 API limitation",
+      "steps": [
+        "Removed X-Plasma-NotificationArea from metadata.json",
+        "Widget no longer auto-appears in system tray",
+        "Root cause: CompactRepresentation id lookup fails in system tray context",
+        "Decision: Support panel and desktop placement only",
+        "Users wanting tray icon can use codexbar-tray Python app instead"
+      ],
+      "passes": true
+    },
+    {
+      "id": "bug-3",
+      "category": "bug",
+      "description": "Reset time should display 'Resets in <time>' instead of just '<time>'",
+      "steps": [
+        "View ProviderCard with active usage data",
+        "Session reset time shows 'Resets in 2h 15m' (not just '2h 15m')",
+        "Weekly reset time shows 'Resets in 3d 22h' (not just '3d 22h')",
+        "Verify ProviderCard.qml getResetTime() adds 'Resets in' prefix"
+      ],
+      "passes": true
+    },
+    {
+      "id": "bug-4",
+      "category": "bug",
+      "description": "Claude icon missing orange brand color - currently white",
+      "steps": [
+        "Open contents/icons/claude.svg",
+        "Icon uses Claude's orange brand color (#CC5500 or similar)",
+        "Icon displays correctly in ProviderCard with orange color visible",
+        "Icon remains visible on both light and dark themes"
+      ],
+      "passes": true
+    }
+  ],
+  "context": {
+    "patterns": [
+      "CLI JSON output format: see CodexBar upstream project",
+      "Color thresholds (70%, 90%): hardcoded in UsageBar.qml",
+      "Relative time formatting: implemented in ProviderCard.qml",
+      "UI layout: FullRepresentation.qml + ProviderCard.qml"
+    ],
+    "keyFiles": [
+      "com.codexbar.widget/contents/ui/main.qml",
+      "com.codexbar.widget/contents/ui/ProviderCard.qml",
+      "com.codexbar.widget/contents/ui/UsageBar.qml",
+      "com.codexbar.widget/contents/ui/FullRepresentation.qml",
+      "scripts/install.sh"
+    ],
+    "nonGoals": [
+      "Cursor/other providers - Focus on Claude + Codex only",
+      "Historical charts - Progress bars only; charts in v2",
+      "Multi-account support - Single account per provider",
+      "GNOME support - KDE-first; GNOME widget is separate PRD",
+      "KDE Store publishing - Manual install first",
+      "D-Bus service - Plasmoid is self-contained",
+      "Plasma 5 support - Plasma 6+ only; Python tray remains for Plasma 5"
+    ]
+  }
+}

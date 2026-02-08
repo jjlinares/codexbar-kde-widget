@@ -1,0 +1,75 @@
+{
+  "prdName": "all-providers",
+  "tasks": [
+    {
+      "id": "main-1",
+      "category": "main",
+      "description": "Add properties and handlers for all 17 providers",
+      "steps": [
+        "Add {provider}Data, {provider}Error, {provider}ErrorMessage, enable{Provider} for each",
+        "Add fetch{Provider} and handle{Provider}Response for each",
+        "Update handleConfigResponse to set enable{Provider} from CLI config",
+        "Update fetchAllData to iterate all enabled providers"
+      ],
+      "passes": true,
+      "notes": "Implemented with dynamic maps (providerData, providerError, etc.) instead of individual properties. Generic fetchProvider() and handleProviderResponse() functions."
+    },
+    {
+      "id": "ui-1",
+      "category": "ui",
+      "description": "Add ProviderCards for all providers in FullRepresentation",
+      "steps": [
+        "Add ProviderCard for each provider with visible: root.enable{Provider}",
+        "Wrap in ScrollView for scrolling when many enabled"
+      ],
+      "passes": true,
+      "notes": "Used Repeater over allProviderIds with dynamic bindings. ScrollView wraps content."
+    },
+    {
+      "id": "ui-2",
+      "category": "ui",
+      "description": "Update worstUsage and tooltip for all providers",
+      "steps": [
+        "worstUsage checks all enabled providers",
+        "buildTooltipText lists all enabled providers"
+      ],
+      "passes": true,
+      "notes": "Both iterate allProviderIds and check enabledProviders map."
+    },
+    {
+      "id": "icons-1",
+      "category": "icons",
+      "description": "Add SVG icons for all providers",
+      "steps": [
+        "Get icons from CodexBar project or create them",
+        "Place in contents/icons/{provider}.svg"
+      ],
+      "passes": true,
+      "notes": "All 17 provider icons already present in contents/icons/"
+    },
+    {
+      "id": "config-1",
+      "category": "config",
+      "description": "Simplify config dialog - remove provider toggles",
+      "steps": [
+        "Remove provider checkboxes from configGeneral.qml",
+        "Keep only refresh interval and notification thresholds",
+        "Remove lastProviderChange mechanism (no longer needed)"
+      ],
+      "passes": true,
+      "notes": "Removed DataSource, provider state, toggle functions. Added info message directing users to CLI."
+    }
+  ],
+  "context": {
+    "providerList": [
+      "claude", "codex", "cursor", "copilot", "gemini", "kiro", "amp",
+      "augment", "jetbrains", "factory", "opencode", "antigravity",
+      "zai", "minimax", "kimi", "kimik2", "vertexai"
+    ],
+    "cliCommands": {
+      "readConfig": "codexbar config dump --json",
+      "fetchUsage": "codexbar usage --provider {id} --source oauth --json"
+    },
+    "configLocation": "~/.codexbar/config.json"
+  }
+}

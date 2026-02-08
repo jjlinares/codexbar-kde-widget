@@ -1,0 +1,64 @@
+# All-Providers PRD Progress
+
+## Status: COMPLETE
+
+All 5 tasks completed. Widget now supports all 17 CodexBar providers.
+
+## Architecture
+
+### Dynamic Data Model (main.qml)
+Instead of individual properties per provider, uses maps:
+- `allProviderIds` - array of 17 provider IDs
+- `providerData[id]` - usage data object
+- `providerError[id]` - error boolean
+- `providerErrorMessage[id]` - error string
+- `enabledProviders[id]` - enabled state from CLI
+- `providerBackoffSeconds[id]` - backoff timer
+- `providerConsecutiveErrors[id]` - error count
+
+### Generic Functions
+- `fetchProvider(id, source)` - fetches usage for any provider
+- `handleProviderResponse(id, stdout, stderr, exitCode)` - handles response
+- `getProviderDisplayName(id)` - gets name from ProviderMetadata singleton
+
+### UI (FullRepresentation.qml)
+- `Repeater` over `allProviderIds` generates ProviderCards dynamically
+- Each card binds to `root.providerData[modelData]`, etc.
+- `ScrollView` wraps content for scrolling when many providers enabled
+- `enabledCount` computed property for "no providers" message
+
+### Provider Metadata (ProviderMetadata.qml)
+Singleton with all provider info:
+- id, displayName, dashboardURL, brandColor, defaultEnabled
+
+### Config Dialog (configGeneral.qml)
+Simplified - only contains:
+- Refresh interval slider (30-300s)
+- Notification thresholds (warning/critical %)
+- Info message: "Enable providers with: codexbar config"
+
+## Technical Notes
+- CLI config location: `~/.codexbar/config.json`
+- Widget is READ-ONLY for provider config
+- Users enable/disable via CLI, widget just displays
+- All 17 icons in contents/icons/{provider}.svg
+- ProviderCard has fallback icon if SVG missing
+
+## Files Modified
+- main.qml - dynamic model, generic handlers
+- FullRepresentation.qml - Repeater + ScrollView
+- configGeneral.qml - simplified, provider toggles removed
+- ProviderMetadata.qml - already had all 17 providers
+
+## Providers Supported
+claude, codex, cursor, copilot, gemini, kiro, amp, augment,
+jetbrains, factory, opencode, antigravity, zai, minimax,
+kimi, kimik2, vertexai
+
+## To Test
+```bash
+./scripts/install.sh
+# or manually:
+kpackagetool6 -t Plasma/Applet -r com.codexbar.widget
+kpackagetool6 -t Plasma/Applet -i com.codexbar.widget
+```
